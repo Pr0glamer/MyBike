@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New bike</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<style>
+    .create-button {
+        background-color: royalblue;
+        color: white;
+    }
+</style>
+<body>
+
+<form th:method="POST" th:action="@{/bikes}" th:object="${bike}">
+    <div class="mdl-textfield mdl-js-textfield">
+        <label class="mdl-textfield__label" for="title">Bike name: </label>
+        <input class="mdl-textfield__input" type="text" th:field="*{title}" id="title"/>
+        <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
+    </div>
+    <br/>
+    <div class="mdl-textfield mdl-js-textfield">
+        <label class="mdl-textfield__label" for="author">Producer: </label>
+        <input class="mdl-textfield__input" type="text" th:field="*{producer}" id="author"/>
+        <div style="color:red" th:if="${#fields.hasErrors('producer')}" th:errors="*{producer}">Producer Error</div>
+    </div>
+    <br/>
+    <div class="mdl-textfield mdl-js-textfield">
+        <label class="mdl-textfield__label" for="year">Year: </label>
+        <input class="mdl-textfield__input" type="text" th:field="*{year}" id="year"/>
+        <div style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}">Year Error</div>
+    </div>
+    <br/>
+
+    <div class="mdl-textfield mdl-js-textfield">
+        <label for="year"  class="mdl-textfield__label">Price: </label>
+        <input type="text" class="mdl-textfield__input" th:field="*{price}" id="year" />
+        <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
+    </div>
+
+    <input type="submit" value="Create!" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
+
+</form>
+
+
+</body>
+</html>

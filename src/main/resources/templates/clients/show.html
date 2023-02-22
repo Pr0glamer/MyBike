@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Show</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<style>
+    .create-button {
+        background-color: royalblue;
+        color: white;
+        height: 20px;
+        font-size: 10px;
+        line-height: 10px;
+    }
+
+    body {
+        font-size: 15px;
+    }
+    .block {
+        margin: 3px;
+    }
+    a {
+        color: royalblue;
+    }
+
+</style>
+<body>
+
+<div class="block">
+    <span>client: </span> <span th:text="${client.getFullName() + ', ' + client.getYearOfBirth()}">
+    </span>
+</div>
+
+<div th:if="${bikes.isEmpty()}">
+    <p>Didn't rent any bike</p>
+</div>
+
+<div th:if="${!bikes.isEmpty()}">
+    <hr/>
+    <b>Bikes:</b>
+    <br/>
+    <table th:each="bike : ${bikes}">
+        <tr>
+            <td>
+                <a th:href="@{/bikes/{id}(id=${bike.getId()})}"
+                   th:text="${bike.getTitle() + ', ' + bike.getProducer() + ', ' + bike.getYear()}"
+                   th:style="${bike.isExpired()} ? 'color: red' : 'color: blue'">
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+<br/>
+<hr/>
+
+<div th:if="${debts.isEmpty()}">
+    <p>Any debts</p>
+</div>
+<div th:if="${!debts.isEmpty()}">
+    <b>Debts:</b>
+    <br/>
+    <table th:each="debt : ${debts}">
+        <tr>
+            <td>
+                <form th:method="POST" th:action="@{/debts/pay/{id}(id=${debt.getId()})}">
+                   <input type="text" th:value="${debt.amount}" id="amount" name="amount">
+                    <div th:if="${errorMessage}" th:style="'color: red'">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+                    <input type="submit" value="Pay">
+                </form>
+            </td>
+        </tr>
+    </table>
+    <hr/>
+</div>
+<a href = "/clients"> Go to clients </a>
+<br>
+<a href = "/bikes"> Go to bikes </a>
+
+</body>
+</html>

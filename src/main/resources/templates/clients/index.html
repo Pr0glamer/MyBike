@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<div style='text-align:right; margin: 10px' >
+    <form th:action="@{/logout}" th:method="POST">
+        <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
+    </form>
+</div>
+<br>
+<br>
+
+<div class="container my-2">
+    <h1>All clients</h1>
+    <a href = "/clients/new" class="btn btn-primary btn-sm mb-3"> Add client </a>
+    <table border="1" class = "table table-striped table-responsive-md">
+        <thead>
+        <tr>
+            <th>
+                <a th:href="@{'/clients?page=' + ${currentPage} + '&sortField=id&sortDir=' + ${reverseSortDir}}">
+                    Id</a>
+            </th>
+            <th>
+                <a th:href="@{'/clients?page=' + ${currentPage} + '&sortField=fullName&sortDir=' + ${reverseSortDir}}">
+                    Name</a>
+            </th>
+            <th>
+                <a th:href="@{'/clients?page=' + ${currentPage} + '&sortField=yearOfBirth&sortDir=' + ${reverseSortDir}}">
+                    Year</a>
+            </th>
+            <th>
+                <a th:href="@{'/clients?page=' + ${currentPage} + '&sortField=telephone&sortDir=' + ${reverseSortDir}}">
+                    Telephone</a>
+            </th>
+
+            <th>Debt</th>
+
+            <th> Actions </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr th:each="client : ${clients}">
+            <td><a th:href="@{/clients/{id}(id=${client.getId()})}" th:text="${client.id}"/></td>
+            <td th:text="${client.fullName}"></td>
+            <td th:text="${client.yearOfBirth}"></td>
+            <td th:text="*{client.telephone}"></td>
+            <div th:if="*{client.debt == 0}">
+                <td>-</td>
+            </div>
+
+            <div th:if="*{client.debt != 0}">
+                <td th:text="*{client.debt}"></td>
+            </div>
+            <td>
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                        <a th:href="@{/clients/{id}/edit(id=${client.getId()})}" class="btn btn-primary btn-sm">Edit</a>
+                    </div>
+                    <div class="col-auto">
+                        <form th:method="DELETE" th:action="@{/clients/{id}(id=${client.getId()})}" >
+                            <input type="submit" class="btn btn-danger btn-sm" value="Delete"/>
+                        </form>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+    <br/>
+    <hr/>
+    <div th:if="${totalPages > 1}">
+        <div class="row col-sm-10">
+            <div class="col-sm-3">
+                Total Rows: [[${totalItems}]]
+            </div>
+            <div class="col-sm-1">
+                    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                          <a th:if="${currentPage != i}"
+                             th:href="@{'/clients?page=' + ${i} + '&sortField='+${sortField}+'&sortDir=' + ${sortDir}}">[[${i}]]</a>
+                          <span th:unless="${currentPage != i}">[[${i}]]</span>
+                    </span>
+            </div>
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{'/clients?page=' + ${currentPage + 1} + '&sortField='+${sortField}+'&sortDir=' + ${sortDir}}">Next</a>
+                <span th:unless="${currentPage < totalPages}">Next</span>
+            </div>
+
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{'/clients?page=' + ${totalPages} + '&sortField='+${sortField}+'&sortDir=' + ${sortDir}}">Last</a>
+                <span th:unless="${currentPage < totalPages}">Last</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+</body>
+</html>

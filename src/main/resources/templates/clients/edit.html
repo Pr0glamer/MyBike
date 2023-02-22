@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit client</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<style>
+    .create-button {
+        background-color: royalblue;
+        color: white;
+    }
+</style>
+<body>
+
+<form th:method="PATCH" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
+    <div class="mdl-textfield mdl-js-textfield">
+        <label for="fullName" class="mdl-textfield__label">Enter fullname: </label>
+        <input type="text" class="mdl-textfield__input" th:field="*{fullName}" id="fullName"/>
+        <div style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name Error</div>
+    </div>
+    <br/>
+    <div class="mdl-textfield mdl-js-textfield">
+        <label for="yearOfBirth" class="mdl-textfield__label">Year of birth: </label>
+        <input type="text" class="mdl-textfield__input" th:field="*{yearOfBirth}" id="yearOfBirth"/>
+        <div style="color:red" th:if="${#fields.hasErrors('yearOfBirth')}" th:errors="*{yearOfBirth}">Year of birth Error</div>
+    </div>
+    <br/>
+    <div class="mdl-textfield mdl-js-textfield">
+        <label for="telephone" class="mdl-textfield__label">Telephone: </label>
+        <input type="text" class="mdl-textfield__input" th:field="*{telephone}" id="telephone"/>
+        <div style="color:red" th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}">Telephone Error</div>
+    </div>
+
+    <br/>
+    <input type="submit" value="Edit!" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
+</form>
+
+</body>
+</html>

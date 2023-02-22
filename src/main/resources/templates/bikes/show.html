@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Show</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<style>
+    .create-button {
+        background-color: royalblue;
+        color: white;
+        height: 30px;
+        font-size: 10px;
+        line-height: 10px;
+    }
+
+    body {
+        font-size: 15px;
+    }
+    .block {
+        margin: 3px;
+    }
+    a {
+        color: royalblue;
+    }
+
+</style>
+<body>
+<div class="block">
+    <span>Bike: </span>
+    <span th:text="${bike.getTitle() + ', ' + bike.getProducer() + ', ' + bike.getYear()}" id="bike">
+    </span>
+</div>
+
+<div class="block">
+    <div th:if="${owner}">
+        <span>Bike now is at: </span>
+        <span>
+            <a th:href="@{/clients/{id}(id=${owner.getId()})}" th:text="${owner.getFullName()}"/>
+        </span>
+        <form class="mdl-form" th:method="PATCH" th:action="@{/bikes/{id}/release(id=${bike.getId()})}">
+            <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Release bike"/>
+        </form>
+    </div>
+</div>
+
+<div th:if="${clients}">
+    <span>Bike if free. Rent?</span>
+
+    <form class="mdl-form" th:method="PATCH" th:action="@{/bikes/{id}/assign(id=${bike.getId()})}">
+        <label class="mdl-selectfield__label" for="client">Select client</label>
+        <select class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label" th:object="${client}" th:field="*{id}" id="client">
+            <option th:each="client : ${clients}" th:value="${client.getId()}" th:text="${client.getFullName()}"></option>
+        </select>
+        <div class="mdl-textfield mdl-js-textfield">
+            <label for="hours"  class="mdl-textfield__label">Hours: </label>
+            <input type="text" id="hours" class="mdl-textfield__input" name="hours" />
+        </div>
+        <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Rent"/>
+    </form>
+</div>
+
+<hr/>
+<a href = "/clients"> Go to clients </a>
+<br>
+<a href = "/bikes"> Go to bikes </a>
+
+
+</body>
+</html>
