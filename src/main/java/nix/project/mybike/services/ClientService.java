@@ -3,8 +3,9 @@ package nix.project.mybike.services;
 import nix.project.mybike.models.Bike;
 import nix.project.mybike.models.Client;
 import nix.project.mybike.models.Debt;
-import nix.project.mybike.repositories.DebtsRepository;
+import nix.project.mybike.models.Reservation;
 import nix.project.mybike.repositories.ClientsRepository;
+import nix.project.mybike.repositories.DebtsRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,13 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -28,15 +27,15 @@ public class ClientService {
 
     private final ClientsRepository clientsRepository;
 
-    private final DebtService debtService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${constant.expired}")
     private int expired;
 
     @Autowired
-    public ClientService(ClientsRepository clientsRepository, DebtsRepository debtsRepository, DebtService debtService) {
+    public ClientService(ClientsRepository clientsRepository, DebtsRepository debtsRepository,PasswordEncoder passwordEncoder) {
         this.clientsRepository = clientsRepository;
-        this.debtService = debtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Client> findAll() {
@@ -50,7 +49,15 @@ public class ClientService {
 
     @Transactional
     public Client save(Client client) {
+
+        String encodedPassword = passwordEncoder.encode(client.getPassword());
+        client.setPassword(encodedPassword);
+        client.setRole("ROLE_USER");
         return clientsRepository.save(client);
+    }
+
+    public Optional<Client> getUserByLogin(String login) {
+        return clientsRepository.findByLogin(login);
     }
 
     @Transactional
@@ -103,18 +110,31 @@ public class ClientService {
         }
     }
 
-    public List<Debt> getDebtByClientId(int id) {
+    public Map<Bike, Integer> getDebtByClientId(int id) {
         Optional<Client> client = clientsRepository.findById(id);
         if (client.isPresent()) {
             Hibernate.initialize(client.get().getDebts());
-            return client.get().getDebts().stream().filter(d->d.getAmount() > 0).collect(Collectors.toList());
+            var result =  client.get().getDebts().stream().
+                    collect(Collectors.groupingBy(Debt::getBike, Collectors.summingInt(Debt::getAmount)));
+            result.values().removeIf(v->v == 0);
+            return result;
+           // return client.get().getDebts().stream().filter(d->d.getAmount() > 0).collect(Collectors.toList());
+        }
+        else {
+            return Collections.emptyMap();
+        }
+    }
+
+    public List<Reservation> getReservationsByClientId(int id) {
+
+        Optional<Client> client = clientsRepository.findById(id);
+        if (client.isPresent()) {
+            Hibernate.initialize(client.get().getDebts());
+            return client.get().getReservations();
         }
         else {
             return Collections.emptyList();
         }
-    }
 
-    public void pay(Debt debt, int amount) {
-        debtService.pay(debt, amount);
     }
 }

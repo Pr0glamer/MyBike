@@ -12,10 +12,19 @@
         background-color: royalblue;
         color: white;
     }
+    input[type="file"] {
+        display: none;
+    }
+    .custom-file-upload {
+        display: inline-block;
+        cursor: pointer;
+        margin-bottom: auto;
+    }
 </style>
+
 <body>
 
-<form th:method="POST" th:action="@{/bikes}" th:object="${bike}">
+<form th:method="POST" th:action="@{/bikes}" th:object="${bike}" enctype="multipart/form-data">
     <div class="mdl-textfield mdl-js-textfield">
         <label class="mdl-textfield__label" for="title">Bike name: </label>
         <input class="mdl-textfield__input" type="text" th:field="*{title}" id="title"/>
@@ -40,11 +49,15 @@
         <input type="text" class="mdl-textfield__input" th:field="*{price}" id="year" />
         <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
     </div>
-
+    <br/>
+    <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
+        Select file
+    </label>
+    <br/>
+    <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" />
+    <br/>
     <input type="submit" value="Create!" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
-
 </form>
-
 
 </body>
 </html>

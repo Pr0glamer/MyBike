@@ -18,6 +18,18 @@
 
 <form th:method="POST" th:action="@{/clients}" th:object="${client}">
     <div class="mdl-textfield mdl-js-textfield">
+        <label for="login" class="mdl-textfield__label">Login: </label>
+        <input type="text" class="mdl-textfield__input" th:field="*{login}" id="login"/>
+        <div style="color:red" th:if="${#fields.hasErrors('login')}" th:errors="*{login}">login</div>
+    </div>
+    <br/>
+    <div class="mdl-textfield mdl-js-textfield">
+        <label for="password" class="mdl-textfield__label">Password: </label>
+        <input type="text" class="mdl-textfield__input" th:field="*{password}" id="password"/>
+        <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">login</div>
+    </div>
+    <br/>
+     <div class="mdl-textfield mdl-js-textfield">
         <label for="fullName" class="mdl-textfield__label">Enter full name: </label>
         <input type="text" class="mdl-textfield__input" th:field="*{fullName}" id="fullName"/>
         <div style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name Error</div>

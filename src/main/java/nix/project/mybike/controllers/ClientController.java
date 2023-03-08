@@ -59,6 +59,8 @@ public class ClientController {
         model.addAttribute("client", clientService.findOne(id));
         model.addAttribute("bikes",  clientService.getBikesByClientId(id));
         model.addAttribute("debts",  clientService.getDebtByClientId(id));
+        model.addAttribute("reservations",  clientService.getReservationsByClientId(id));
+
 
         return "clients/show";
     }
@@ -66,7 +68,7 @@ public class ClientController {
 
 
     @GetMapping("/new")
-    public String newclient(@ModelAttribute("client") Client client) {
+    public String newClient(@ModelAttribute("client") Client client) {
         return "clients/new";
     }
 
@@ -93,10 +95,15 @@ public class ClientController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("client") @Valid Client client, BindingResult bindingResult,
                          @PathVariable("id") int id) {
-        if (bindingResult.hasErrors())
-            return "clients/edit";
 
-        clientService.update(id, client);
+        Client clientFromDataBase = clientService.findOne(id);
+        if(clientFromDataBase != null) {
+            clientFromDataBase.setFullName(client.getFullName());
+            clientFromDataBase.setYearOfBirth(client.getYearOfBirth());
+            clientFromDataBase.setTelephone(client.getTelephone());
+            clientService.update(id, clientFromDataBase);
+        }
+
         return "redirect:/clients";
     }
 
@@ -105,4 +112,6 @@ public class ClientController {
         clientService.delete(id);
         return "redirect:/clients";
     }
+
+
 }

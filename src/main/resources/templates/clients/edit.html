@@ -16,6 +16,7 @@
 <body>
 
 <form th:method="PATCH" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
+
     <div class="mdl-textfield mdl-js-textfield">
         <label for="fullName" class="mdl-textfield__label">Enter fullname: </label>
         <input type="text" class="mdl-textfield__input" th:field="*{fullName}" id="fullName"/>

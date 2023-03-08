@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <style>
     .create-button {
@@ -30,8 +31,22 @@
 </style>
 <body>
 
+<div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <span>
+            <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
+            <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+        </span>
+    </div>
+    <div>
+        <form th:action="@{/logout}" th:method="POST">
+            <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
+        </form>
+    </div>
+</div>
+
 <div class="block">
-    <span>client: </span> <span th:text="${client.getFullName() + ', ' + client.getYearOfBirth()}">
+    <span><b>Сlient:</b></span> <span th:text="${client.getFullName() + ', ' + client.getYearOfBirth()}">
     </span>
 </div>
 
@@ -55,10 +70,26 @@
     </table>
 </div>
 <br/>
+
+<div th:if="${!reservations.isEmpty()}">
+    <hr/>
+    <b>Reservations:</b>
+    <br/>
+    <table th:each="res : ${reservations}">
+        <tr>
+            <td>
+                <a th:href="@{/bikes/{id}(id=${res.getReservedBike().getId()})}"
+                   th:text="${#dates.format(res.getReserveDate(), 'dd-MM-yyyy')}">
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+<br/>
 <hr/>
 
 <div th:if="${debts.isEmpty()}">
-    <p>Any debts</p>
+    <p><b>Any debts</b></p>
 </div>
 <div th:if="${!debts.isEmpty()}">
     <b>Debts:</b>
@@ -66,8 +97,10 @@
     <table th:each="debt : ${debts}">
         <tr>
             <td>
-                <form th:method="POST" th:action="@{/debts/pay/{id}(id=${debt.getId()})}">
-                   <input type="text" th:value="${debt.amount}" id="amount" name="amount">
+                <form th:method="POST" th:action="@{/debts/pay}">
+                    <input type="text" th:value="${debt.value}" id="amount" name="amount">
+                    <input type="hidden" th:value="${client.id}" id="clientId" name="clientId">
+                    <input type="hidden" th:value="${debt.key.getId()}" id="bikeId" name="bikeId">
                     <div th:if="${errorMessage}" th:style="'color: red'">
                         <span th:text="${errorMessage}"></span>
                     </div>
@@ -78,9 +111,7 @@
     </table>
     <hr/>
 </div>
-<a href = "/clients"> Go to clients </a>
-<br>
-<a href = "/bikes"> Go to bikes </a>
+
 
 </body>
 </html>

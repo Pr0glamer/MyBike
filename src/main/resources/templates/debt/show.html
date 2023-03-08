@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+</head>
+<body>
+<div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
+    <div>
+        <span>
+            <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
+            <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+        </span>
+    </div>
+    <div>
+        <form th:action="@{/logout}" th:method="POST">
+            <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
+        </form>
+    </div>
+</div>
+
+<div class="container my-2">
+    <h1>Debts</h1>
+    <table border="1" class = "table table-striped table-responsive-md">
+        <thead>
+        <tr>
+            <th>Client Name</th>
+            <th>Bike Name</th>
+            <th>Debt Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <div th:each="client : ${debts}">
+            <tr>
+                <div class="form-row align-items-center">
+                    <td th:text="${client.key.fullName}"></td>
+                </div>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr th:each="debtDTO : ${client.value}">
+                <td></td>
+                <div class="form-row align-items-center">
+                    <td th:text="${debtDTO.bike.title}"></td>
+                </div>
+                <div class="form-row align-items-center">
+                    <td th:text="${debtDTO.amount}"></td>
+                </div>
+            </tr>
+        </div>
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+</html>

@@ -27,7 +27,7 @@ public class ClientValidator implements Validator {
     public void validate(Object o, Errors errors) {
         Client user = (Client) o;
 
-        if (clientService.getClientByFullName(user.getFullName()).isPresent())
+        if (clientService.getUserByLogin(user.getLogin()).isPresent())
             errors.rejectValue("login", "", "User with login exists");
     }
 }

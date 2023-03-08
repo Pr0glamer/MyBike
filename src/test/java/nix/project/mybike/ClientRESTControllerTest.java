@@ -45,7 +45,7 @@ public class ClientRESTControllerTest {
     public void getClient_withValidId_returnsClient() throws Exception {
 
         int clientId = 123;
-        Client client = new Client(clientId, "Faust", 1991, 380093339099L, null, null);
+        Client client = new Client(clientId, "Faust", 1991, 380093339099L, "", "", null, null, null, null);
         given(clientService.findOne(clientId)).willReturn(client);
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -76,7 +76,7 @@ public class ClientRESTControllerTest {
     @Test
     public void createClient_withValidRequest_returnsCreatedClient() throws Exception {
 
-        Client newClient = new Client(123, "Faust", 1991, 380093339099L, null, null);
+        Client newClient = new Client(123, "Faust", 1991, 380093339099L, "ROLE_USER", "dfadfdf", null, null, null, null);
         given(clientService.save(any(Client.class))).willReturn(newClient);
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(newClient);
@@ -98,7 +98,7 @@ public class ClientRESTControllerTest {
     @Test
     public void createClient_withInvalidRequest_returnsBadRequest() throws Exception {
 
-        Client invalidClient = new Client(-1, "", 0, 0L, null, null);
+        Client invalidClient = new Client(-1, "", 0, 0L, "", "", null, null, null, null);
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(invalidClient);
 
@@ -112,7 +112,7 @@ public class ClientRESTControllerTest {
     public void deleteClient_withValidId_deletesClient() throws Exception {
 
         int clientId = 123;
-        Client newClient = new Client(clientId, "Faust", 1991, 380093339099L, null, null);
+        Client newClient = new Client(clientId, "Faust", 1991, 380093339099L, "", "", null, null, null, null);
         given(clientService.findOne(clientId)).willReturn(newClient);
 
 

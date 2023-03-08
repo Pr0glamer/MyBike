@@ -1,7 +1,7 @@
 package nix.project.mybike.config;
 
 
-import nix.project.mybike.services.UsersDetailsService;
+import nix.project.mybike.services.ClientDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -15,17 +15,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UsersDetailsService usersDetailsService;
+    private final ClientDetailsService clientDetailsService;
 
     @Autowired
-    public SecurityConfig(UsersDetailsService usersDetailsService) {
-        this.usersDetailsService = usersDetailsService;
+    public SecurityConfig(ClientDetailsService clientDetailsService) {
+        this.clientDetailsService = clientDetailsService;
     }
 
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(usersDetailsService).passwordEncoder(getPasswordEncoder());
+        auth.userDetailsService(clientDetailsService).passwordEncoder(getPasswordEncoder());
     }
 
     @Bean
@@ -38,10 +38,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.
                  authorizeHttpRequests()
+                .antMatchers("/clients").hasRole("ADMIN")
+                .antMatchers("/debts").hasRole("ADMIN")
                 .antMatchers("/auth/login", "/error", "/auth/registration").permitAll()
-               // .antMatchers("/rest/**").permitAll()
-                .anyRequest().authenticated()
-                //.anyRequest().permitAll()
+               // .anyRequest().authenticated()
+                .anyRequest().hasAnyRole("USER", "ADMIN")
                 .and()
                 .formLogin().loginPage("/auth/login").loginProcessingUrl("/process_login")
                 .defaultSuccessUrl("/bikes", true)

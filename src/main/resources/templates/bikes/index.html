@@ -16,20 +16,30 @@
     }
 </style>
 <body>
-<div style='text-align:right; margin: 10px' >
-    <form th:action="@{/logout}" th:method="POST">
-        <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
-    </form>
+<div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <span>
+            <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
+            <a href = "/debts" class="btn btn-primary btn-sm mb-3"> Go to debts </a>
+        </span>
+    </div>
+    <div>
+        <form th:action="@{/logout}" th:method="POST">
+            <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
+        </form>
+    </div>
 </div>
 
-<br>
-<br>
 
+
+<br>
+<br>
 
 <div class="container my-2">
     <h1>All bikes</h1>
-
-    <a href = "/bikes/new" class="btn btn-primary btn-sm mb-3"> Add bike </a>
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <a href = "/bikes/new" class="btn btn-primary btn-sm mb-3"> Add bike </a>
+    </div>
 
     <form th:method="GET" th:action="@{/bikes}">
         <div class="form-row">
@@ -84,14 +94,15 @@
             <th> Picture </th>
 
 
-
-            <th> Actions </th>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <th> Actions </th>
+            </div>
         </tr>
         </thead>
         <tbody>
         <tr th:each="bike : ${bikes}">
             <td>
-                <a th:href="@{/bikes/{id}(id=${bike.getId()})}" th:style="${bike.isExpired()} ? 'color: red' : 'color: blue'" th:text="${bike.title}">Edit</a>
+                <a th:href="@{/bikes/{id}(id=${bike.getId()})}" th:style="${bike.checkBusy()} ? 'color: red' : 'color: blue'" th:text="${bike.title}">Edit</a>
             </td>
             <td th:text="${bike.producer}"></td>
             <td th:text="${bike.year}"></td>
@@ -103,32 +114,24 @@
                     </div>
                 </div>
             </td>
-            <td>
-                <div class="form-row align-items-center">
-                    <div class="col-auto">
-                        <a th:href="@{/bikes/{id}/edit(id=${bike.getId()})}" class="btn btn-primary btn-sm">Edit</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <td>
+                    <div class="form-row align-items-center">
+                        <div class="col-auto">
+                            <a th:href="@{/bikes/{id}/edit(id=${bike.getId()})}" class="btn btn-primary btn-sm">Edit</a>
+                        </div>
+                        <div class="col-auto">
+                            <form th:method="DELETE" th:action="@{/bikes/{id}(id=${bike.getId()})}" >
+                                <input type="submit" class="btn btn-danger btn-sm" value="Delete"/>
+                            </form>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <form th:method="DELETE" th:action="@{/bikes/{id}(id=${bike.getId()})}" >
-                            <input type="submit" class="btn btn-danger btn-sm" value="Delete"/>
-                        </form>
-                    </div>
-                    <div class="col-auto">
-                        <form th:action="@{/bikes/{id}/upload-picture(id=${bike.getId()})}" th:object="${bike}" method="post" enctype="multipart/form-data">
-                            <label th:attrappend="for=${'file-upload' + bike.getId()}" class="btn btn-primary btn-sm custom-file-upload">
-                                Select file
-                            </label>
-                            <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="picture" required="required"/>
-                            <input type="submit" value="Upload picture" class="btn btn-primary btn-sm">
-                        </form>
-                    </div>
-                </div>
-            </td>
+                </td>
+            </div>
         </tr>
     </tbody>
  </table>
 
- <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
 <br/>
 <hr/>
 

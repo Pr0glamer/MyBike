@@ -14,6 +14,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -31,9 +34,12 @@ public class BikesService {
     @Value("${constant.expired}")
     private int expired;
 
+    @Value("${constant.pathtodefaultimage}")
+    private String pathToDefaultImg;
+
     @Autowired
-    public BikesService(BikesRepository booksRepository, DebtsRepository debtsRepository) {
-        this.bikesRepository = booksRepository;
+    public BikesService(BikesRepository bikesRepository, DebtsRepository debtsRepository) {
+        this.bikesRepository = bikesRepository;
         this.debtsRepository = debtsRepository;
     }
 
@@ -90,8 +96,8 @@ public class BikesService {
     }
 
     public Bike findOne(int id) {
-        Optional<Bike> foundBook = bikesRepository.findById(id);
-        return foundBook.orElse(null);
+        Optional<Bike> foundBike = bikesRepository.findById(id);
+        return foundBike.orElse(null);
     }
 
     public List<Bike> searchByTitle(String query, boolean available) {
@@ -114,8 +120,8 @@ public class BikesService {
 
 
     @Transactional
-    public void save(Bike bike) {
-        bikesRepository.save(bike);
+    public Bike save(Bike bike) {
+       return bikesRepository.save(bike);
     }
 
     @Transactional
@@ -136,17 +142,21 @@ public class BikesService {
     }
 
     @Transactional
-    public void release(int id) {
-        bikesRepository.findById(id).ifPresent(
+    public Bike release(int id) {
+        Optional<Bike> probablyBike= bikesRepository.findById(id);
+        probablyBike.ifPresent(
                 bike -> {
                     bike.setOwner(null);
                     bike.setTakenAt(null);
                 });
+
+        return probablyBike.orElse(null);
     }
 
     @Transactional
-    public void assign(int id, Client selectedClient, int hours) {
-        bikesRepository.findById(id).ifPresent(
+    public Bike assign(int id, Client selectedClient, int hours) {
+        Optional<Bike> probablyBike= bikesRepository.findById(id);
+        probablyBike.ifPresent(
                 bike -> {
                     bike.setOwner(selectedClient);
                     bike.setTakenAt(new Date());
@@ -157,12 +167,33 @@ public class BikesService {
                     debtsRepository.save(debt);
                 }
         );
+        return probablyBike.orElse(null);
     }
 
     @Transactional
     public Bike findById(int id) {
         Bike bike = bikesRepository.findById(id).get();
         return bike;
+    }
+
+    public Optional<byte[]> getDefaultImageBytes() {
+        byte[] byteArray = null;
+        try {
+            InputStream inputStream = getClass().getResourceAsStream(pathToDefaultImg);
+
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                int read;
+                byte[] buffer = new byte[4096];
+                while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                byteArray = outputStream.toByteArray();
+            }
+        } catch (IOException e) {
+
+        }
+
+        return Optional.of(byteArray);
     }
 
 }

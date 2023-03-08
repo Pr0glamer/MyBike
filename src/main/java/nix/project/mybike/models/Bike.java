@@ -2,10 +2,7 @@ package nix.project.mybike.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,13 +18,17 @@ import java.util.List;
 @Table(name = "bike")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class Bike {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Override
+    public String toString() {
+        return title;
+    }
 
     @NotEmpty(message = "Should not be empty")
     @Size(min = 2, max = 100, message = "From 2 to 100 symbols")
@@ -65,8 +66,15 @@ public class Bike {
     @JsonIgnore
     private List<Debt> debts;
 
+    @OneToMany(mappedBy = "reservedBike")
+    @JsonIgnore
+    private List<Reservation> reservations;
+
     @Transient
     private boolean expired;
+
+    @Transient
+    private boolean busy;
 
     @Value("${constant.expired}")
     @Transient
@@ -81,6 +89,11 @@ public class Bike {
         if (diffInMillies > rentPeriod) {
             this.setExpired(true);
         }
+    }
+
+    public boolean checkBusy() {
+        var takenAt = this.getTakenAt();
+        return takenAt!=null;
     }
 
 }

@@ -1,0 +1,1 @@
+Bike %s reserved on %s by %s. Call him %s

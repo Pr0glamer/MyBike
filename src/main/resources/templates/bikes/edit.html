@@ -6,16 +6,25 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <style>
     .create-button {
         background-color: royalblue;
         color: white;
     }
+    input[type="file"] {
+        display: none;
+    }
+    .custom-file-upload {
+        display: inline-block;
+        cursor: pointer;
+        margin-bottom: auto;
+    }
 </style>
 <body>
 <br>
-<form th:method="PATCH" th:action="@{/bikes/{id}(id=${bike.getId()})}" th:object="${bike}">
+<form th:method="PATCH" th:action="@{/bikes/{id}(id=${bike.getId()})}" th:object="${bike}" enctype="multipart/form-data">
 
     <div class="mdl-textfield mdl-js-textfield">
             <label for="title" class="mdl-textfield__label">Bike name: </label>
@@ -42,10 +51,17 @@
         <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
     </div>
     <br/>
-
-     <input type="submit" value="Edit" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
+    <img th:src="@{/bikes/image/{id}(id=${bike.id})}" style="width:200px;height:200px;"/>
+    <br/>
+    <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
+        Select file
+    </label>
+    <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" required="required"/>
+    <br/>
+    <input type="submit" value="Edit" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
 
 </form>
+
 
 </body>
 </html>

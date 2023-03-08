@@ -15,20 +15,39 @@
 <body>
 
 
-<form th:method="POST" th:action="@{/auth/registration}" th:object="${user}">
+<form th:method="POST" th:action="@{/auth/registration}" th:object="${client}">
 
   <div class="form-group beautify">
 
 
-    <label for="login">Full name: </label>
+    <label for="login">Login: </label>
     <input type="text" th:field="*{login}" id="login" class="form-control"/>
     <div style="color:red" th:if="${#fields.hasErrors('login')}" th:errors="*{login}">Username Error</div>
   </div>
   <br/>
   <div class="form-group beautify">
-    <label for="password">Введите пароль: </label>
+    <label for="password">Password: </label>
     <input type="password" th:field="*{password}" id="password" class="form-control"/>
     <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
+  </div>
+  <br/>
+  <div class="form-group beautify">
+    <label for="telephone">Full name: </label>
+    <input type="text" th:field="*{fullName}" id="fullName" class="form-control"/>
+    <div style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full name error</div>
+  </div>
+  <br/>
+  <div class="form-group beautify">
+    <label for="telephone">Telephone: </label>
+    <input type="text" th:field="*{telephone}" id="telephone" class="form-control"/>
+    <div style="color:red" th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}">Telephone error</div>
+  </div>
+  <br/>
+
+  <div class="form-group beautify">
+    <label for="telephone">Year if birth: </label>
+    <input type="text" th:field="*{yearOfBirth}" id="yearOfBirth" class="form-control"/>
+    <div style="color:red" th:if="${#fields.hasErrors('yearOfBirth')}" th:errors="*{yearOfBirth}">Year if birth error</div>
   </div>
   <br/>
 

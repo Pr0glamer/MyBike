@@ -3,9 +3,8 @@ package nix.project.mybike.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
@@ -13,15 +12,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Entity
 @Table(name = "client")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class Client {
     @Id
     @Column(name = "id")
@@ -33,6 +30,11 @@ public class Client {
     @Column(name = "full_name")
     private String fullName;
 
+    @Override
+    public String toString() {
+        return fullName + " (" + login + ')';
+    }
+
     @Min(value = 1900, message = "Must be grater than 1900")
     @Column(name = "year_of_birth")
     private Integer yearOfBirth;
@@ -40,12 +42,19 @@ public class Client {
     @Column(name = "telephone")
     private Long telephone;
 
-    public List<Debt> getDebts() {
-        return debts == null ? Collections.emptyList() : debts.stream().filter(d -> d.getAmount() > 0).collect(Collectors.toList());
-    }
+    @Column(name = "user_role")
+    private String role;
 
-    public void setDebts(List<Debt> debts) {
-        this.debts = debts;
+    @NotEmpty(message = "Should not be empty")
+    @Size(min = 2, max = 100, message = "From 2 to 100 symbols")
+    @Column(name = "login")
+    private String login;
+
+    @Column(name = "password")
+    private String password;
+
+    public List<Debt> getDebts() {
+        return debts == null ? Collections.emptyList() : debts;
     }
 
     @OneToMany(mappedBy = "owner")
@@ -53,6 +62,9 @@ public class Client {
 
     @OneToMany(mappedBy = "owner")
     private List<Debt> debts;
+
+    @OneToMany(mappedBy = "clientWhoReserved")
+    private List<Reservation> reservations;
 
     @JsonIgnore
     public int getDebt() {

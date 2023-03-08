@@ -1,32 +1,35 @@
 package nix.project.mybike.secirity;
 
-import nix.project.mybike.models.User;
+import nix.project.mybike.models.Client;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 
-public class UsersDetails implements UserDetails {
+public class ClientDetails implements UserDetails {
 
-    private final User user;
+    private final Client client;
 
-    public UsersDetails(User user) {
-        this.user = user;
+    public ClientDetails(Client client) {
+        this.client = client;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.singletonList(new SimpleGrantedAuthority(client.getRole()));
+
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return client.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getLogin();
+        return client.getLogin();
     }
 
     @Override
@@ -49,8 +52,8 @@ public class UsersDetails implements UserDetails {
         return true;
     }
 
-    public User getUser(){
-        return user;
+    public Client getUser(){
+        return client;
     }
 
 }

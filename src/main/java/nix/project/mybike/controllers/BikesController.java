@@ -5,6 +5,7 @@ import nix.project.mybike.models.Bike;
 import nix.project.mybike.models.Client;
 import nix.project.mybike.services.BikesService;
 import nix.project.mybike.services.ClientService;
+import nix.project.mybike.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -16,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -29,10 +30,13 @@ public class BikesController {
     private final BikesService bikesService;
     private final ClientService clientService;
 
+    private final ReservationService reservationService;
+
     @Autowired
-    public BikesController(BikesService bikesService, ClientService clientService) {
+    public BikesController(BikesService bikesService, ClientService clientService, ReservationService reservationService) {
         this.bikesService = bikesService;
         this.clientService = clientService;
+        this.reservationService = reservationService;
     }
 
 
@@ -64,7 +68,7 @@ public class BikesController {
         }
 
         List<Bike> bikesContent = bikes.getContent();
-        bikesContent.stream().forEach(Bike::checkExpired);
+        bikesContent.stream().forEach(Bike::checkBusy);
 
         model.addAttribute("bikes",           bikesContent);
         model.addAttribute("currentPage",    page);
@@ -100,10 +104,17 @@ public class BikesController {
 
     @PostMapping()
     public String create(@ModelAttribute("bike") @Valid Bike bike,
+                         @RequestParam("image") MultipartFile imageFile,
                          BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return "bikes/new";
 
+        try {
+            byte[] imageData = imageFile.getBytes();
+            bike.setPicture(imageData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         bikesService.save(bike);
         return "redirect:/bikes";
     }
@@ -115,10 +126,20 @@ public class BikesController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("bike") @Valid Bike bike, BindingResult bindingResult,
-                         @PathVariable("id") int id) {
+    public String update(Model model, @ModelAttribute("bike") @Valid Bike bike, BindingResult bindingResult,
+                         @PathVariable("id") int id, @RequestParam("image") MultipartFile picture) {
         if (bindingResult.hasErrors())
             return "bikes/edit";
+
+        try {
+            if (!picture.isEmpty()) {
+                bike.setPicture(picture.getBytes());
+            }
+            bikesService.save(bike);
+        } catch (IOException e) {
+            model.addAttribute("error", "Failed to upload picture.");
+            e.printStackTrace();
+        }
 
         bikesService.update(id, bike);
         return "redirect:/bikes";
@@ -140,6 +161,16 @@ public class BikesController {
     public String assign(@PathVariable("id") int id, @ModelAttribute("client") Client selectedClient, @RequestParam String hours) {
         bikesService.assign(id, selectedClient, Integer.parseInt(hours));
         return "redirect:/bikes/" + id;
+    }
+
+    @PostMapping("/{id}/reserve")
+    public String reserve(Model model, @PathVariable("id") int id,
+                          @RequestParam String date) {
+        Bike bike = bikesService.findById(id);
+        reservationService.reserve(bike, Date.valueOf(date));
+        model.addAttribute("bike", bike);
+        model.addAttribute("message", "Manager will call You soon");
+        return "bikes/show";
     }
 
     @GetMapping("/search")
@@ -174,24 +205,19 @@ public class BikesController {
     @GetMapping(value = "/image/{id}")
     public ResponseEntity<byte[]> getBikeImage(@PathVariable int id) {
         Bike bike = bikesService.findById(id);
+        if(bike == null) {
+            return ResponseEntity.notFound().build();
+        }
         if (bike.getPicture() != null) {
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bike.getPicture());
         } else {
-            try {
-                InputStream inputStream = getClass().getResourceAsStream("/static/images/default-image.jfif");
-                byte[] byteArray;
-                try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                    int read;
-                    byte[] buffer = new byte[4096];
-                    while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
-                        outputStream.write(buffer, 0, read);
-                    }
-                    byteArray = outputStream.toByteArray();
-                }
-                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(byteArray);
-            } catch (IOException e) {
+            Optional<byte[]> probablyByteArray = bikesService.getDefaultImageBytes();
+            if(!probablyByteArray.isPresent()) {
                 return ResponseEntity.notFound().build();
+            } else {
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(probablyByteArray.get());
             }
+
         }
     }
 

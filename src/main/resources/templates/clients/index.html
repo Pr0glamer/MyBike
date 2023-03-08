@@ -6,10 +6,18 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
-<div style='text-align:right; margin: 10px' >
-    <form th:action="@{/logout}" th:method="POST">
-        <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
-    </form>
+<div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
+    <div>
+        <span>
+            <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+            <a href = "/debts" class="btn btn-primary btn-sm mb-3"> Go to debts </a>
+        </span>
+    </div>
+    <div>
+        <form th:action="@{/logout}" th:method="POST">
+            <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
+        </form>
+    </div>
 </div>
 <br>
 <br>
@@ -72,8 +80,6 @@
         </tbody>
     </table>
 
-    <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
-    <br/>
     <hr/>
     <div th:if="${totalPages > 1}">
         <div class="row col-sm-10">

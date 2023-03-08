@@ -1,8 +1,8 @@
 package nix.project.mybike.controllers;
 
-import nix.project.mybike.models.User;
-import nix.project.mybike.services.UserService;
-import nix.project.mybike.util.UserValidator;
+import nix.project.mybike.models.Client;
+import nix.project.mybike.services.ClientService;
+import nix.project.mybike.util.ClientValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserValidator userValidator;
-    private final UserService userService;
+    private final ClientValidator clientValidator;
+    private final ClientService clientService;
 
     @Autowired
-    public AuthController(UserValidator userValidator, UserService userService) {
-        this.userValidator = userValidator;
-        this.userService = userService;
+    public AuthController(ClientValidator clientValidator, ClientService clientService) {
+        this.clientValidator = clientValidator;
+        this.clientService = clientService;
     }
 
     @GetMapping("/login")
@@ -30,19 +30,19 @@ public class AuthController {
     }
 
     @GetMapping("/registration")
-    public String registrationPage(@ModelAttribute("user") User user) {
+    public String registrationPage(@ModelAttribute("client") Client client) {
         return "auth/registration";
 
     }
     @PostMapping("/registration")
-    public String performRegistration(@ModelAttribute("user") User user, BindingResult bindingResult) {
-        userValidator.validate(user, bindingResult);
+    public String performRegistration(@ModelAttribute("client") Client client, BindingResult bindingResult) {
+        clientValidator.validate(client, bindingResult);
 
         if(bindingResult.hasErrors()){
             return "/auth/registration";
         }
 
-        userService.save(user);
+        clientService.save(client);
 
         return "redirect:/auth/login";
 
