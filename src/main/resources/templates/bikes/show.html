@@ -27,22 +27,31 @@
     a {
         color: royalblue;
     }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .inner {
+        display: block;
+    }
 
 </style>
 <body>
 
 <div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
     <div sec:authorize="hasRole('ROLE_ADMIN')">
-        <span>
-            <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
-            <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
-        </span>
+            <span>
+                <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
+                <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+            </span>
     </div>
 
     <div sec:authorize="!hasRole('ROLE_ADMIN')">
-         <span>
-            <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
-        </span>
+             <span>
+                <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+            </span>
     </div>
 
     <div>
@@ -53,58 +62,62 @@
 
 </div>
 
-<div class="block">
-    <span>Bike: </span>
-    <span th:text="${bike.getTitle() + ', ' + bike.getProducer() + ', ' + bike.getYear()}" id="bike"/>
-    <img th:src="@{/bikes/image/{id}(id=${bike.id})}" alt="no photo"/>
-</div>
-<div sec:authorize="hasRole('ROLE_ADMIN')">
-    <div class="block">
-        <div th:if="${owner}">
-            <span>Bike now is at: </span>
-            <span>
-                <a th:href="@{/clients/{id}(id=${owner.getId()})}" th:text="${owner.getFullName()}"/>
-            </span>
-            <form class="mdl-form" th:method="PATCH" th:action="@{/bikes/{id}/release(id=${bike.getId()})}">
-                <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Release bike"/>
+<div class="container">
+    <div class="inner">
+
+        <div><b>Bike: </b></div>
+        <div th:text="${bike.getTitle() + ', ' + bike.getProducer() + ', ' + bike.getYear()}" id="bike"/>
+        <br>
+        <img th:src="@{/bikes/image/{id}(id=${bike.id})}" alt="no photo" style="max-width: 200px; max-height: 200px;"/>
+    <br>
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+
+            <div th:if="${owner}">
+                <div><b>Bike now is at: </b></div>
+                <div>
+                    <a th:href="@{/clients/{id}(id=${owner.getId()})}" th:text="${owner.getFullName()}"/>
+                </div>
+                <form class="mdl-form" th:method="PATCH" th:action="@{/bikes/{id}/release(id=${bike.getId()})}">
+                    <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Release bike"/>
+                </form>
+            </div>
+
+
+        <div th:if="${clients}">
+            <div><b>Bike if free. Rent?</b></div>
+
+            <form class="mdl-form" th:method="PATCH" th:action="@{/bikes/{id}/assign(id=${bike.getId()})}">
+                <label class="mdl-selectfield__label" for="client">Select client</label>
+                <select class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label" th:object="${client}" th:field="*{id}" id="client">
+                    <option th:each="client : ${clients}" th:value="${client.getId()}" th:text="${client.getFullName()}"></option>
+                </select>
+                <div class="mdl-textfield mdl-js-textfield">
+                    <label for="hours"  class="mdl-textfield__label">Hours: </label>
+                    <input type="text" id="hours" class="mdl-textfield__input" name="hours" />
+                </div>
+                <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Rent"/>
             </form>
         </div>
+        <hr/>
+        <br>
     </div>
+    <div sec:authorize="!hasRole('ROLE_ADMIN')">
+        <span><b>Want to reserve on date?</b></span>
 
-    <div th:if="${clients}">
-        <span>Bike if free. Rent?</span>
-
-        <form class="mdl-form" th:method="PATCH" th:action="@{/bikes/{id}/assign(id=${bike.getId()})}">
-            <label class="mdl-selectfield__label" for="client">Select client</label>
-            <select class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label" th:object="${client}" th:field="*{id}" id="client">
-                <option th:each="client : ${clients}" th:value="${client.getId()}" th:text="${client.getFullName()}"></option>
-            </select>
+        <form class="mdl-form" th:method="POST" th:action="@{/bikes/{id}/reserve(id=${bike.getId()})}">
             <div class="mdl-textfield mdl-js-textfield">
-                <label for="hours"  class="mdl-textfield__label">Hours: </label>
-                <input type="text" id="hours" class="mdl-textfield__input" name="hours" />
+                <label for="date">Date: </label>
+                <input type="date" id="date" class="mdl-textfield__input" name="date" />
             </div>
-            <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Rent"/>
+            <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Reserve"/>
+            <br>
+            <div th:if="${message}" th:style="'color: green'">
+                <span th:text="${message}"></span>
+            </div>
         </form>
     </div>
-    <hr/>
-
+    </div>
 </div>
-<div sec:authorize="!hasRole('ROLE_ADMIN')">
-    <span>Want to reserve on date?</span>
-
-    <form class="mdl-form" th:method="POST" th:action="@{/bikes/{id}/reserve(id=${bike.getId()})}">
-        <div class="mdl-textfield mdl-js-textfield">
-            <label for="date">Date: </label>
-            <input type="date" id="date" class="mdl-textfield__input" name="date" />
-        </div>
-        <input class="create-button mdl-button mdl-js-button mdl-button--raised" type="submit" value="Reserve"/>
-        <br>
-        <div th:if="${message}" th:style="'color: green'">
-            <span th:text="${message}"></span>
-        </div>
-    </form>
-</div>
-
 
 </body>
 </html>

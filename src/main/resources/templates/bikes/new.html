@@ -20,44 +20,52 @@
         cursor: pointer;
         margin-bottom: auto;
     }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
 </style>
 
 <body>
+<div class="container">
+    <form th:method="POST" th:action="@{/bikes}" th:object="${bike}" enctype="multipart/form-data">
+        <div class="mdl-textfield mdl-js-textfield">
+            <label class="mdl-textfield__label" for="title">Bike name: </label>
+            <input class="mdl-textfield__input" type="text" th:field="*{title}" id="title"/>
+            <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
+        </div>
+        <br/>
+        <div class="mdl-textfield mdl-js-textfield">
+            <label class="mdl-textfield__label" for="author">Producer: </label>
+            <input class="mdl-textfield__input" type="text" th:field="*{producer}" id="author"/>
+            <div style="color:red" th:if="${#fields.hasErrors('producer')}" th:errors="*{producer}">Producer Error</div>
+        </div>
+        <br/>
+        <div class="mdl-textfield mdl-js-textfield">
+            <label class="mdl-textfield__label" for="year">Year: </label>
+            <input class="mdl-textfield__input" type="text" th:field="*{year}" id="year"/>
+            <div style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}">Year Error</div>
+        </div>
+        <br/>
 
-<form th:method="POST" th:action="@{/bikes}" th:object="${bike}" enctype="multipart/form-data">
-    <div class="mdl-textfield mdl-js-textfield">
-        <label class="mdl-textfield__label" for="title">Bike name: </label>
-        <input class="mdl-textfield__input" type="text" th:field="*{title}" id="title"/>
-        <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
-    </div>
-    <br/>
-    <div class="mdl-textfield mdl-js-textfield">
-        <label class="mdl-textfield__label" for="author">Producer: </label>
-        <input class="mdl-textfield__input" type="text" th:field="*{producer}" id="author"/>
-        <div style="color:red" th:if="${#fields.hasErrors('producer')}" th:errors="*{producer}">Producer Error</div>
-    </div>
-    <br/>
-    <div class="mdl-textfield mdl-js-textfield">
-        <label class="mdl-textfield__label" for="year">Year: </label>
-        <input class="mdl-textfield__input" type="text" th:field="*{year}" id="year"/>
-        <div style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}">Year Error</div>
-    </div>
-    <br/>
-
-    <div class="mdl-textfield mdl-js-textfield">
-        <label for="year"  class="mdl-textfield__label">Price: </label>
-        <input type="text" class="mdl-textfield__input" th:field="*{price}" id="year" />
-        <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
-    </div>
-    <br/>
-    <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
-        Select file
-    </label>
-    <br/>
-    <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" />
-    <br/>
-    <input type="submit" value="Create!" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
-</form>
+        <div class="mdl-textfield mdl-js-textfield">
+            <label for="year"  class="mdl-textfield__label">Price: </label>
+            <input type="text" class="mdl-textfield__input" th:field="*{price}" id="year" />
+            <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
+        </div>
+        <br/>
+        <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
+            Select file
+        </label>
+        <br/>
+        <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" />
+        <br/>
+        <input type="submit" value="Create!" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
+    </form>
+</div>
 
 </body>
 </html>

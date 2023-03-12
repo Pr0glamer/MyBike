@@ -21,47 +21,59 @@
         cursor: pointer;
         margin-bottom: auto;
     }
+
+     .container {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         height: 100vh;
+     }
+
+
 </style>
 <body>
 <br>
-<form th:method="PATCH" th:action="@{/bikes/{id}(id=${bike.getId()})}" th:object="${bike}" enctype="multipart/form-data">
+<div class="container">
+    <form th:method="PATCH" th:action="@{/bikes/{id}(id=${bike.getId()})}" th:object="${bike}" enctype="multipart/form-data">
 
-    <div class="mdl-textfield mdl-js-textfield">
-            <label for="title" class="mdl-textfield__label">Bike name: </label>
-            <input type="text" class="mdl-textfield__input" th:field="*{title}" id="title" />
-            <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
-    </div>
+        <div class="mdl-textfield mdl-js-textfield">
+                <label for="title" class="mdl-textfield__label">Bike name: </label>
+                <input type="text" class="mdl-textfield__input" th:field="*{title}" id="title" />
+                <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
+        </div>
+            <br/>
+        <div class="mdl-textfield mdl-js-textfield">
+                <label for="author" class="mdl-textfield__label">Producer: </label>
+                <input type="text"  class="mdl-textfield__input" th:field="*{producer}" id="author" />
+                <div style="color:red" th:if="${#fields.hasErrors('producer')}" th:errors="*{producer}">Producer Error</div>
+        </div>
+            <br/>
+        <div class="mdl-textfield mdl-js-textfield">
+                <label for="year"  class="mdl-textfield__label">Year: </label>
+                <input type="text" class="mdl-textfield__input" th:field="*{year}" id="year" />
+                <div style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}">Year Error</div>
+        </div>
+            <br/>
+
+        <div class="mdl-textfield mdl-js-textfield">
+            <label for="year"  class="mdl-textfield__label">Price: </label>
+            <input type="text" class="mdl-textfield__input" th:field="*{price}" id="year" />
+            <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
+        </div>
         <br/>
-    <div class="mdl-textfield mdl-js-textfield">
-            <label for="author" class="mdl-textfield__label">Producer: </label>
-            <input type="text"  class="mdl-textfield__input" th:field="*{producer}" id="author" />
-            <div style="color:red" th:if="${#fields.hasErrors('producer')}" th:errors="*{producer}">Producer Error</div>
-    </div>
+        <img src="/bikes/image/21" style="max-width: 200px; max-height: 200px;">
         <br/>
-    <div class="mdl-textfield mdl-js-textfield">
-            <label for="year"  class="mdl-textfield__label">Year: </label>
-            <input type="text" class="mdl-textfield__input" th:field="*{year}" id="year" />
-            <div style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}">Year Error</div>
-    </div>
         <br/>
+        <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
+            Select file
+        </label>
+        <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" required="required"/>
+        <br/>
+        <br/>
+        <input type="submit" value="Edit" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
 
-    <div class="mdl-textfield mdl-js-textfield">
-        <label for="year"  class="mdl-textfield__label">Price: </label>
-        <input type="text" class="mdl-textfield__input" th:field="*{price}" id="year" />
-        <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
-    </div>
-    <br/>
-    <img th:src="@{/bikes/image/{id}(id=${bike.id})}" style="width:200px;height:200px;"/>
-    <br/>
-    <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
-        Select file
-    </label>
-    <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" required="required"/>
-    <br/>
-    <input type="submit" value="Edit" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
-
-</form>
-
+    </form>
+</div>
 
 </body>
 </html>

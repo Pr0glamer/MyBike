@@ -27,91 +27,103 @@
     a {
         color: royalblue;
     }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .inner {
+        display: block;
+    }
 
 </style>
 <body>
 
-<div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
-    <div sec:authorize="hasRole('ROLE_ADMIN')">
-        <span>
-            <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
-            <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
-        </span>
+    <div style='display:flex; justify-content:space-between; align-items:center; margin: 10px' >
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+            <span>
+                <a href = "/clients" class="btn btn-primary btn-sm mb-3"> Go to clients </a>
+                <a href = "/bikes" class="btn btn-primary btn-sm mb-3"> Go to bikes </a>
+            </span>
+        </div>
+        <div>
+            <form th:action="@{/logout}" th:method="POST">
+                <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
+            </form>
+        </div>
     </div>
-    <div>
-        <form th:action="@{/logout}" th:method="POST">
-            <input type="submit" value="Logout" class="btn btn-primary btn-sm mb-3">
-        </form>
+
+<div class="container">
+    <div class="inner">
+        <div class="block">
+            <span><b>Сlient:</b></span> <span th:text="${client.getFullName() + ', ' + client.getYearOfBirth()}">
+            </span>
+        </div>
+
+        <div th:if="${bikes.isEmpty()}">
+            <p>Didn't rent any bike</p>
+        </div>
+
+        <div th:if="${!bikes.isEmpty()}">
+            <hr/>
+            <b>Bikes:</b>
+            <br/>
+            <table th:each="bike : ${bikes}">
+                <tr>
+                    <td>
+                        <a th:href="@{/bikes/{id}(id=${bike.getId()})}"
+                           th:text="${bike.getTitle() + ', ' + bike.getProducer() + ', ' + bike.getYear()}"
+                           th:style="${bike.isExpired()} ? 'color: red' : 'color: blue'">
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br/>
+
+        <div th:if="${!reservations.isEmpty()}">
+            <hr/>
+            <b>Reservations:</b>
+            <br/>
+            <table th:each="res : ${reservations}">
+                <tr>
+                    <td>
+                        <a th:href="@{/bikes/{id}(id=${res.getReservedBike().getId()})}"
+                           th:text="${#dates.format(res.getReserveDate(), 'dd-MM-yyyy')}">
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br/>
+        <hr/>
+
+        <div th:if="${debts.isEmpty()}">
+            <p><b>Any debts</b></p>
+        </div>
+        <div th:if="${!debts.isEmpty()}">
+            <b>Debts:</b>
+            <br/>
+            <table th:each="debt : ${debts}">
+                <tr>
+                    <td>
+                        <form th:method="POST" th:action="@{/debts/pay}">
+                            <input type="text" th:value="${debt.value}" id="amount" name="amount">
+                            <input type="hidden" th:value="${client.id}" id="clientId" name="clientId">
+                            <input type="hidden" th:value="${debt.key.getId()}" id="bikeId" name="bikeId">
+                            <div th:if="${errorMessage}" th:style="'color: red'">
+                                <span th:text="${errorMessage}"></span>
+                            </div>
+                            <input type="submit" value="Pay">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            <hr/>
+        </div>
     </div>
 </div>
-
-<div class="block">
-    <span><b>Сlient:</b></span> <span th:text="${client.getFullName() + ', ' + client.getYearOfBirth()}">
-    </span>
-</div>
-
-<div th:if="${bikes.isEmpty()}">
-    <p>Didn't rent any bike</p>
-</div>
-
-<div th:if="${!bikes.isEmpty()}">
-    <hr/>
-    <b>Bikes:</b>
-    <br/>
-    <table th:each="bike : ${bikes}">
-        <tr>
-            <td>
-                <a th:href="@{/bikes/{id}(id=${bike.getId()})}"
-                   th:text="${bike.getTitle() + ', ' + bike.getProducer() + ', ' + bike.getYear()}"
-                   th:style="${bike.isExpired()} ? 'color: red' : 'color: blue'">
-                </a>
-            </td>
-        </tr>
-    </table>
-</div>
-<br/>
-
-<div th:if="${!reservations.isEmpty()}">
-    <hr/>
-    <b>Reservations:</b>
-    <br/>
-    <table th:each="res : ${reservations}">
-        <tr>
-            <td>
-                <a th:href="@{/bikes/{id}(id=${res.getReservedBike().getId()})}"
-                   th:text="${#dates.format(res.getReserveDate(), 'dd-MM-yyyy')}">
-                </a>
-            </td>
-        </tr>
-    </table>
-</div>
-<br/>
-<hr/>
-
-<div th:if="${debts.isEmpty()}">
-    <p><b>Any debts</b></p>
-</div>
-<div th:if="${!debts.isEmpty()}">
-    <b>Debts:</b>
-    <br/>
-    <table th:each="debt : ${debts}">
-        <tr>
-            <td>
-                <form th:method="POST" th:action="@{/debts/pay}">
-                    <input type="text" th:value="${debt.value}" id="amount" name="amount">
-                    <input type="hidden" th:value="${client.id}" id="clientId" name="clientId">
-                    <input type="hidden" th:value="${debt.key.getId()}" id="bikeId" name="bikeId">
-                    <div th:if="${errorMessage}" th:style="'color: red'">
-                        <span th:text="${errorMessage}"></span>
-                    </div>
-                    <input type="submit" value="Pay">
-                </form>
-            </td>
-        </tr>
-    </table>
-    <hr/>
-</div>
-
 
 </body>
 </html>

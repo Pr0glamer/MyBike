@@ -39,7 +39,7 @@ public class ReservationService {
     @Value("${constant.email.info.subject}")
     private String subject;
 
-    @Autowired
+
     private final ResourceLoader resourceLoader;
 
 
