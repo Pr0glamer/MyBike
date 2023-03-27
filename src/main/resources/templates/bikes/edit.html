@@ -31,6 +31,16 @@
 
 
 </style>
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var bikeImage = document.getElementById('bike-image');
+            bikeImage.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
 <body>
 <br>
 <div class="container">
@@ -61,13 +71,13 @@
             <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
         </div>
         <br/>
-        <img src="/bikes/image/21" style="max-width: 200px; max-height: 200px;">
+        <img id="bike-image" th:src = "@{/bikes/image/{id}(id=${bike.getId()})}" style="max-width: 200px; max-height: 200px;">
         <br/>
         <br/>
         <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
             Select file
         </label>
-        <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" required="required"/>
+        <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" required="required" onchange="previewImage(event)"/>
         <br/>
         <br/>
         <input type="submit" value="Edit" class="create-button mdl-button mdl-js-button mdl-button--raised"/>

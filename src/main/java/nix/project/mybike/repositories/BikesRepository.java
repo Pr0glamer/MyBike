@@ -21,5 +21,7 @@ public interface BikesRepository extends JpaRepository<Bike, Integer> {
 
     @Query(value = "SELECT * FROM Bike b WHERE b.taken_at IS NULL", nativeQuery = true)
     Page<Bike> findBikeAvailable(Pageable pageable);
+    List<Bike> findAll();
+
 
 }

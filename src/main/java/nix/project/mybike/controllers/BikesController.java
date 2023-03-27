@@ -204,6 +204,14 @@ public class BikesController {
 
     @GetMapping(value = "/image/{id}")
     public ResponseEntity<byte[]> getBikeImage(@PathVariable int id) {
+        if(id == -1){
+            Optional<byte[]> probablyByteArray = bikesService.getDefaultImageBytes();
+            if(!probablyByteArray.isPresent()) {
+                return ResponseEntity.notFound().build();
+            } else {
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(probablyByteArray.get());
+            }
+         }
         Bike bike = bikesService.findById(id);
         if(bike == null) {
             return ResponseEntity.notFound().build();

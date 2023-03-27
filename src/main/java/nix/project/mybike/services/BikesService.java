@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +38,19 @@ public class BikesService {
     @Value("${constant.pathtodefaultimage}")
     private String pathToDefaultImg;
 
+    private final EmailService emailService;
+
+    @Value("${constant.email.info.manager}")
+    private String manager;
+
+    @Value("${constant.email.expired.subject}")
+    private String subject;
+
     @Autowired
-    public BikesService(BikesRepository bikesRepository, DebtsRepository debtsRepository) {
+    public BikesService(BikesRepository bikesRepository, DebtsRepository debtsRepository, EmailService emailService) {
         this.bikesRepository = bikesRepository;
         this.debtsRepository = debtsRepository;
+        this.emailService = emailService;
     }
 
     public List<Bike> findAll(boolean sortByYear) {
@@ -174,6 +184,31 @@ public class BikesService {
     public Bike findById(int id) {
         Bike bike = bikesRepository.findById(id).get();
         return bike;
+    }
+
+    @Scheduled(cron = "0 50 18 * * *")
+    public void sendExpiredBikeNotificationEmails() {
+        List<Bike> expiredBikes = bikesRepository.findAll();
+        for (Bike bike : expiredBikes) {
+            bike.checkExpired();
+            if(bike.isExpired()) {
+                continue;
+            }
+            Client owner = bike.getOwner();
+            if (owner != null) {
+                String subject = "Your bike rental has expired";
+                String message = "Dear " + owner.getFullName() + ",\n\n"
+                        + "Your rental of the bike \"" + bike.getTitle() + "\" has expired. Please return the bike as soon as possible to avoid additional charges.\n\n"
+                        + "Thank you for choosing our bike rental service.\n\n"
+                        + "Best regards,\n"
+                        + "The Bike Rental Team";
+
+                emailService.sendSimpleMessage(manager,
+                        subject,
+                        message);
+
+            }
+        }
     }
 
     public Optional<byte[]> getDefaultImageBytes() {

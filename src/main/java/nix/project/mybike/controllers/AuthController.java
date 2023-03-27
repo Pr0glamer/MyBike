@@ -34,11 +34,12 @@ public class AuthController {
         return "auth/registration";
 
     }
+
     @PostMapping("/registration")
     public String performRegistration(@ModelAttribute("client") Client client, BindingResult bindingResult) {
         clientValidator.validate(client, bindingResult);
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "/auth/registration";
         }
 
@@ -47,6 +48,5 @@ public class AuthController {
         return "redirect:/auth/login";
 
     }
-
-
 }
+

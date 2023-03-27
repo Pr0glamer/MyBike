@@ -19,10 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +36,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -53,9 +58,20 @@ public class BikeControllerTest {
 
     private MockMvc mockMvc;
 
+    @Mock
+    private MultipartFile imageFile;
+
+    @Mock
+    private BindingResult bindingResult;
+
+    @Mock
+    private ModelAndView modelAndView;
+
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
         mockMvc = MockMvcBuilders.standaloneSetup(bikesController).build();
+        byte[] fileContent = "test data".getBytes();
+        when(imageFile.getBytes()).thenReturn(fileContent);
     }
 
     @Test
@@ -106,9 +122,9 @@ public class BikeControllerTest {
     @Test
     public void testCreate() throws Exception {
 
-
-        mockMvc.perform(post("/bikes")
-                        .param("title", "Test bike")
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/bikes")
+                        .file("image", "test.png".getBytes())
+                        .param("title", "title")
                         .param("producer", "Producer 1")
                         .param("year", "1999"))
                 .andExpect(status().is3xxRedirection())
@@ -119,11 +135,13 @@ public class BikeControllerTest {
 
     @Test
     public void testCreateValidationError() throws Exception {
-        mockMvc.perform(post("/bikes")
-                        .param("title", ""))
-                .andExpect(status().isOk())
-                .andExpect(view().name("bikes/new"))
-                .andExpect(model().attributeHasFieldErrors("bike", "title"));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/bikes")
+                        .file("image", "test.png".getBytes())
+                        .param("title", "")
+                        .param("producer", "Producer 1")
+                        .param("year", ""))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

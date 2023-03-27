@@ -28,7 +28,16 @@
     }
 
 </style>
-
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var bikeImage = document.getElementById('bike-image');
+            bikeImage.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
 <body>
 <div class="container">
     <form th:method="POST" th:action="@{/bikes}" th:object="${bike}" enctype="multipart/form-data">
@@ -57,11 +66,14 @@
             <div style="color:red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">price Error</div>
         </div>
         <br/>
+        <img id="bike-image" th:src = "@{/bikes/image/-1}" style="max-width: 200px; max-height: 200px;">
+        <br/>
+        <br/>
         <label th:attrappend="for=${'file-upload' + bike.getId()}" class="create-button mdl-button mdl-js-button mdl-button--raised">
             Select file
         </label>
         <br/>
-        <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" />
+        <input th:attrappend="id=${'file-upload' + bike.getId()}" type="file" name="image" onchange="previewImage(event)"/>
         <br/>
         <input type="submit" value="Create!" class="create-button mdl-button mdl-js-button mdl-button--raised"/>
     </form>

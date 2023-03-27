@@ -143,6 +143,7 @@ public class ClientControllerTest {
     public void updateClientTest() throws Exception {
         int clientId = 1;
         Client client = new Client();
+        when(clientService.findOne(clientId)).thenReturn(client);
         doNothing().when(clientService).update(clientId, client);
         String viewName = clientController.update(client, bindingResult, clientId);
         verify(clientService, times(1)).update(clientId, client);
